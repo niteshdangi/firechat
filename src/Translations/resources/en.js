@@ -1,5 +1,5 @@
 export default {
-  welcome: 'Welcome to React Native Boilerplate by TheCodingMachine',
+  welcome: 'Welcome to React Native FireChat by TheCodingMachine',
   actions: {
     continue: 'Continue',
   },
@@ -9,4 +9,4 @@ export default {
       userId: 'Enter a user id',
     },
   },
-}
+};

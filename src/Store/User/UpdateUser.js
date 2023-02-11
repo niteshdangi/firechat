@@ -5,11 +5,7 @@ export default {
   action: createAction('user/updateDefaultUser'),
   reducers(state, {payload}) {
     if (payload.user) {
-      state.current = {...state.current, ...payload.user};
-      state.list = [
-        {...state.current, ...payload.user},
-        ...state.list.slice(1, state.list.length - 1),
-      ];
+      state.user = payload.user;
     }
   },
 };

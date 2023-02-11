@@ -36,11 +36,19 @@ class ChatHistory extends Component {
       <ScrollView style={{transform: [{scale: -1}]}}>
         {data.map((value, index) => (
           <View
+            key={value.id}
             style={{
               marginBottom: index == data.length - 1 ? 20 : 0,
             }}>
             <Message
-              id={index}
+              id={value.id}
+              data={value}
+              prev={data[index - 1]}
+              next={data[index + 1]}
+              user={this.props.user}
+              uid={this.props.uid}
+              reply={this.props.reply}
+              users={this.props.users}
               showMessageOptions={this.props.showMessageOptions}
             />
           </View>

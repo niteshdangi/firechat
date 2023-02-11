@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "292592073686",
+    "firebase_url": "https://firechat-dangi-default-rtdb.firebaseio.com",
+    "project_id": "firechat-dangi",
+    "storage_bucket": "firechat-dangi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:292592073686:android:c22800b70a10588d6fc277",
+        "android_client_info": {
+          "package_name": "com.firechatdangi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "292592073686-0ijgb7tqtokdimkglesd8qh11rbflr5g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.firechatdangi",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "292592073686-8likkdba3fp5m95dalepv02ftu2l1gd5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7YvknpsZFySjYl2ooS9NEqv_4285AGzg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "292592073686-8likkdba3fp5m95dalepv02ftu2l1gd5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

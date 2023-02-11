@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {navigateAndSimpleReset} from '@/Navigators/Root';
 import {
   ActivityIndicator,
   View,
@@ -9,10 +8,6 @@ import {
   BackHandler,
 } from 'react-native';
 import {useTheme} from '@/Theme';
-import {useDispatch, useSelector} from 'react-redux';
-import DefaultUser from '@/Store/User/DefaultUser';
-import {useTranslation} from 'react-i18next';
-import {Brand} from '@/Components';
 import {
   ApplicationProvider,
   Button,
@@ -23,7 +18,9 @@ import * as eva from '@eva-design/eva';
 import Animated, {Easing} from 'react-native-reanimated';
 import NumberScreen from './NumberScreen';
 import OtpScreen from './OtpScreen';
-
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {navigateAndSimpleReset} from '../../Navigators/Root';
 const numberanim = new Animated.Value(0);
 const otpanim = new Animated.Value(0);
 const loadinganim = new Animated.Value(0);
@@ -35,6 +32,7 @@ const LoginContainer = () => {
   const [errornumber, setErrorNumber] = React.useState(false);
   const [otp, setotp] = React.useState('');
   const [errorotp, setErrorotp] = React.useState(false);
+  const [confirm, setConfirm] = React.useState(null);
   // const {t} = useTranslation();
   useEffect(() => {
     Animated.timing(numberanim, {
@@ -74,15 +72,18 @@ const LoginContainer = () => {
       'hardwareBackPress',
       backAction,
     );
+    return () => {
+      backHandler.remove();
+    };
+  }, [loading, otpscreen]);
 
-    return () => backHandler.remove();
-  }, [numberanim, otpanim, loadinganim, otpscreen, loading]);
-  const dispatch = useDispatch();
-  // const user = useSelector((state) => state.user);
-  const sendotp = () => {
+  const sendotp = async () => {
     if (number.length !== 10) setErrorNumber(true);
     else {
       setLoading(true);
+      const confirmation = await auth().signInWithPhoneNumber('+91' + number);
+      console.log(confirmation);
+      setConfirm(confirmation);
       setTimeout(() => {
         Animated.timing(numberanim, {
           toValue: 0,
@@ -114,20 +115,29 @@ const LoginContainer = () => {
     }
   };
   const verifyotp = async (value = otp) => {
-    if (value.length !== 4) value = otp;
-    if (value.length !== 4) setErrorotp(true);
+    if (value.length !== 6) value = otp;
+    if (value.length !== 6) setErrorotp(true);
     else {
+      console.log(value);
       setErrorotp(false);
       setLoading(true);
-      const user = {
-        mobile: number,
-        name: '',
-        image: '',
-        setup: false,
-      };
-      await dispatch(DefaultUser.action({user, list: [user]}));
-      setLoading(false);
-      navigateAndSimpleReset('ProfileSetup');
+      try {
+        await confirm.confirm(value);
+        //  const user = auth().currentUser;
+        //   await firestore().collection('users').doc(user.uid).add({
+        //     uid: user.uid,
+        //     displayName: user.displayName,
+        //     photoURL: user.photoURL,
+        //     mobile: user.phoneNumber,
+        //     about: '',
+        //     active: true,
+        //     lastActive: new Date().getTime(),
+        //   });
+        navigateAndSimpleReset('Main');
+      } catch (error) {
+        setErrorotp(true);
+        setLoading(false);
+      }
     }
   };
   return (

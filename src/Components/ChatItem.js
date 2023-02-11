@@ -1,4 +1,4 @@
-import {Layout, Text} from '@ui-kitten/components';
+import {Icon, Layout, Text} from '@ui-kitten/components';
 import React, {PureComponent} from 'react';
 import {
   Animated,
@@ -15,6 +15,7 @@ import {
   State,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
+import FirebaseImage from './FirebaseImage';
 class ChatItem extends PureComponent {
   state = {
     width: this.props.data.user.active
@@ -24,10 +25,18 @@ class ChatItem extends PureComponent {
   pan = new Animated.Value(0);
   image = new Animated.Value(1);
   imageView = React.createRef();
-  handleLayoutChange() {}
+
   render() {
     const {theme, data} = this.props;
-
+    var selfSend = data.lastMessage.sid == this.props?.self;
+    var seen = data.users?.length == data.lastMessage.seen?.length;
+    if (!selfSend && !seen) {
+      data.lastMessage.seen.forEach((elem) => {
+        if (elem == this.props?.self) {
+          seen = true;
+        }
+      });
+    }
     return (
       <TouchableWithoutFeedback
         onPressIn={() => {
@@ -80,7 +89,7 @@ class ChatItem extends PureComponent {
                       px,
                       py,
                       from: 'list',
-                      data,
+                      data: data.user,
                     });
                   });
                 }
@@ -107,7 +116,7 @@ class ChatItem extends PureComponent {
                         }),
                       },
                     ],
-                    backgroundColor: theme.NavigationTheme.colors.background,
+                    backgroundColor: theme.Colors.background,
                   }}>
                   <Animated.View style={[{marginVertical: 15}]}>
                     <Layout
@@ -130,7 +139,7 @@ class ChatItem extends PureComponent {
                               options({
                                 px,
                                 py,
-                                data,
+                                data: data.user,
                                 to: 'center',
                                 from: 'list',
                               });
@@ -138,12 +147,9 @@ class ChatItem extends PureComponent {
                           );
                         }}>
                         <View
-                          onLayout={(event) => {
-                            this.handleLayoutChange(event);
-                          }}
+                          onLayout={(e) => {}}
                           ref={(ref) => (this.imageView = ref)}>
-                          {this.props.optionsData?.data.user.id !==
-                          data.user.id ? (
+                          {this.props.optionsData?.data?.id !== data.user.id ? (
                             <Animated.View
                               style={{
                                 transform: [
@@ -172,10 +178,11 @@ class ChatItem extends PureComponent {
                                   width: 70,
                                   height: 70,
                                   borderRadius: 70,
-                                  overflow: 'hidden',
+                                  // overflow: 'hidden',
                                 }}>
-                                <Image
-                                  source={data.user.image}
+                                <FirebaseImage
+                                  url={data.user.photoURL}
+                                  default={theme.Images.user}
                                   style={{
                                     width: '100%',
                                     height: '100%',
@@ -217,10 +224,19 @@ class ChatItem extends PureComponent {
                             : () => {};
                           this.imageView.measure(
                             (fx, fy, width, height, px, py) => {
-                              options({px, py, data, to: 'chat', from: 'list'});
+                              options({
+                                px,
+                                py,
+                                data: data.user,
+                                to: 'chat',
+                                from: 'list',
+                              });
                             },
                           );
-                          this.props.openChat();
+                          this.props.openChat({
+                            ...data.user,
+                            users: data.users,
+                          });
                         }}>
                         <View
                           style={{
@@ -243,7 +259,7 @@ class ChatItem extends PureComponent {
                                 width: this.state.width - 20,
                               }}
                               numberOfLines={1}>
-                              {data.user.name}
+                              {data.user?.displayName}
                             </Text>
                             <View
                               style={{
@@ -251,23 +267,55 @@ class ChatItem extends PureComponent {
                                 alignItems: 'center',
                                 flexDirection: 'row',
                               }}>
+                              {selfSend && (
+                                <Icon
+                                  name="done-all-outline"
+                                  style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginRight: 5,
+                                    tintColor: seen
+                                      ? theme.Colors.primary
+                                      : theme.Colors.text,
+                                  }}
+                                />
+                              )}
                               <Text
                                 style={{
                                   maxWidth: this.state.width - 80,
+                                  fontWeight:
+                                    !selfSend && !seen ? 'bold' : 'normal',
+                                  fontSize: !selfSend && !seen ? 17 : null,
                                 }}
                                 numberOfLines={1}>
-                                {data.message.text}
+                                {data.lastMessage.text
+                                  ? data.lastMessage.text
+                                  : data.lastMessage.sticker
+                                  ? 'Sticker'
+                                  : data.lastMessage.gif
+                                  ? 'GIF'
+                                  : data.lastMessage.media
+                                  ? 'Media'
+                                  : 'New Message'}
                               </Text>
-                              <Text
-                                style={{
-                                  width: 60,
-                                  fontSize: 11,
-                                }}
-                                appearance="hint"
-                                numberOfLines={1}>
-                                {' \u25CF '}
-                                {data.message.time}
-                              </Text>
+                              {data.lastMessage.timestamp && (
+                                <Text
+                                  style={{
+                                    width: 60,
+                                    fontWeight:
+                                      !selfSend && !seen ? 'bold' : 'normal',
+                                    fontSize: 11,
+                                  }}
+                                  appearance="hint"
+                                  numberOfLines={1}>
+                                  {' \u25CF '}
+                                  {formatAMPM(
+                                    new Date(
+                                      parseInt(data.lastMessage.timestamp),
+                                    ),
+                                  )}
+                                </Text>
+                              )}
                             </View>
                           </View>
                           {!data.user.active && (
@@ -292,7 +340,9 @@ class ChatItem extends PureComponent {
                               <Text
                                 style={{fontSize: 11, marginTop: 5}}
                                 appearance="hint">
-                                Today at 10:00 AM
+                                {getLastActive(
+                                  new Date(parseInt(data.user.lastActive)),
+                                )}
                               </Text>
                             </View>
                           )}
@@ -310,3 +360,57 @@ class ChatItem extends PureComponent {
   }
 }
 export default ChatItem;
+
+export function formatAMPM(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  minutes = minutes ? minutes : '00';
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+}
+export function getLastActive(date_) {
+  const date = new Date(date_);
+  const now = new Date();
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'June',
+    'July',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  if (date.getFullYear() == now.getFullYear()) {
+    if (date.getDate() == now.getDate()) {
+      if (now.getMinutes() - date.getMinutes() < 1) {
+        return 'few sec ago';
+      } else {
+        return 'Today at ' + formatAMPM(date);
+      }
+    } else if (date.getDate() == now.getDate() - 1) {
+      return 'Yesterday at ' + formatAMPM(date);
+    } else if (date.getMonth() == now.getMonth()) {
+      return (
+        date.getDate() +
+        ' ' +
+        months[date.getMonth()] +
+        ' at ' +
+        formatAMPM(date)
+      );
+    }
+  } else {
+    return (
+      date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear()
+    );
+  }
+  return date.getTime();
+}

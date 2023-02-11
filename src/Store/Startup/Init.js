@@ -6,32 +6,22 @@ import {
 import DefaultUser from '@/Store/User/DefaultUser';
 import {navigateAndSimpleReset} from '@/Navigators/Root';
 import DefaultTheme from '@/Store/Theme/DefaultTheme';
-import ChangeTheme from '@/Store/Theme/ChangeTheme';
-import {Appearance} from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 export default {
   initialState: buildAsyncState(),
-  action: buildAsyncActions('startup/init', async (user, {dispatch}) => {
-    var cuser = user.current;
-    if (user.list.length > 0 && user.current == {}) {
-      await dispatch(DefaultUser.action({user: user.list[0]}));
-      cuser = user.list[0];
-    } else if (user.list.length == 0 && user.current != {}) {
-      await dispatch(DefaultUser.action({list: user.current}));
-    }
-    if (cuser) {
-      //validate token
-    }
+  action: buildAsyncActions('startup/init', async (args, {dispatch}) => {
+    const user = auth().currentUser;
     await dispatch(
       DefaultTheme.action({
         theme: 'default',
         darkMode: false,
       }),
     );
-    if (!cuser) {
+    if (!user) {
       navigateAndSimpleReset('Login');
     } else {
-      if (!cuser.setup) navigateAndSimpleReset('ProfileSetup');
+      if (user.displayName == null) navigateAndSimpleReset('ProfileSetup');
       else navigateAndSimpleReset('Main');
     }
   }),

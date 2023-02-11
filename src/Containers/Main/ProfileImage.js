@@ -2,6 +2,7 @@ import {Button, Icon, Layout} from '@ui-kitten/components';
 import React, {PureComponent} from 'react';
 import {Animated, Dimensions, Image, Text, View} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import FirebaseImage from '../../Components/FirebaseImage';
 class ProfileImage extends PureComponent {
   anim = new Animated.Value(0);
   state = {
@@ -154,8 +155,9 @@ class ProfileImage extends PureComponent {
               {scaleY: height},
             ],
           }}>
-          <Image
-            source={data.user.image}
+          <FirebaseImage
+            url={data?.photoURL}
+            default={this.props.theme.Images.user}
             style={{width: '100%', height: '100%'}}
           />
         </Animated.View>

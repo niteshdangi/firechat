@@ -14,10 +14,14 @@ const OtpInput = ({onSubmitEditing, setOtp, errorotp}) => {
   const o2 = React.useRef();
   const o3 = React.useRef();
   const o4 = React.useRef();
+  const o5 = React.useRef();
+  const o6 = React.useRef();
   const [v1, setv1] = React.useState('');
   const [v2, setv2] = React.useState('');
   const [v3, setv3] = React.useState('');
   const [v4, setv4] = React.useState('');
+  const [v5, setv5] = React.useState('');
+  const [v6, setv6] = React.useState('');
   return (
     <View
       style={{
@@ -30,7 +34,7 @@ const OtpInput = ({onSubmitEditing, setOtp, errorotp}) => {
         style={[style, errorotp ? {borderBottomColor: 'red'} : {}]}
         onChangeText={(value) => {
           setv1(value);
-          setOtp(value + v2 + v3 + v4);
+          setOtp(value + v2 + v3 + v4 + v5 + v6);
           if (value) o2.current.focus();
         }}
         value={v1}
@@ -44,7 +48,7 @@ const OtpInput = ({onSubmitEditing, setOtp, errorotp}) => {
         style={[style, errorotp ? {borderBottomColor: 'red'} : {}]}
         onChangeText={(value) => {
           setv2(value);
-          setOtp(v1 + value + v3 + v4);
+          setOtp(v1 + value + v3 + v4 + v5 + v6);
           if (value) o3.current.focus();
         }}
         keyboardType="number-pad"
@@ -66,7 +70,7 @@ const OtpInput = ({onSubmitEditing, setOtp, errorotp}) => {
         value={v3}
         onChangeText={(value) => {
           setv3(value);
-          setOtp(v1 + v2 + value + v4);
+          setOtp(v1 + v2 + value + v4 + v5 + v6);
           if (value) o4.current.focus();
         }}
         onKeyPress={(e) => {
@@ -84,13 +88,51 @@ const OtpInput = ({onSubmitEditing, setOtp, errorotp}) => {
         maxLength={1}
         value={v4}
         onChangeText={(value) => {
-          setOtp(v1 + v2 + v3 + value);
+          setOtp(v1 + v2 + v3 + value + v5 + v6);
           setv4(value);
-          //   if (value) o2.current.focus();
+          if (value) o5.current.focus();
         }}
         onKeyPress={(e) => {
           if (e.nativeEvent.key == 'Backspace' && v4 == '') {
             o3.current.focus();
+          }
+        }}
+        onSubmitEditing={onSubmitEditing}
+        secureTextEntry
+      />
+      <TextInput
+        ref={o5}
+        style={[style, errorotp ? {borderBottomColor: 'red'} : {}]}
+        keyboardType="number-pad"
+        maxLength={1}
+        value={v5}
+        onChangeText={(value) => {
+          setOtp(v1 + v2 + v3 + v4 + value + v6);
+          setv5(value);
+          if (value) o6.current.focus();
+        }}
+        onKeyPress={(e) => {
+          if (e.nativeEvent.key == 'Backspace' && v5 == '') {
+            o4.current.focus();
+          }
+        }}
+        onSubmitEditing={onSubmitEditing}
+        secureTextEntry
+      />
+      <TextInput
+        ref={o6}
+        style={[style, errorotp ? {borderBottomColor: 'red'} : {}]}
+        keyboardType="number-pad"
+        maxLength={1}
+        value={v6}
+        onChangeText={(value) => {
+          setOtp(v1 + v2 + v3 + v4 + v5 + value);
+          setv6(value);
+          //   if (value) o2.current.focus();
+        }}
+        onKeyPress={(e) => {
+          if (e.nativeEvent.key == 'Backspace' && v6 == '') {
+            o5.current.focus();
           }
         }}
         onSubmitEditing={onSubmitEditing}

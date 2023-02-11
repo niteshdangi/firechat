@@ -15,17 +15,22 @@ import {configureStore} from '@reduxjs/toolkit';
 import startup from './Startup';
 import user from './User';
 import theme from './Theme';
-
+import image from './Image';
+import messages from './Messages';
+import contacts from './Contacts';
 const reducers = combineReducers({
   startup,
   user,
   theme,
+  image,
+  messages,
+  contacts,
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['theme', 'user'],
+  whitelist: ['theme', 'user', 'image', 'messages', 'contacts'],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

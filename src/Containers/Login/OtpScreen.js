@@ -21,7 +21,7 @@ const OtpScreen = ({
   const _setotp = (value) => {
     setotp(value);
     setErrorotp(false);
-    if (value.length == 4) verifyotp(value);
+    if (value.length == 6) verifyotp(value);
   };
   return (
     <Animated.View
